@@ -1,26 +1,34 @@
 ## Description
-Brief description of the changes made in this pull request.
+<!-- Describe your changes in detail -->
 
 ## Type of Change
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
+- [ ] Code refactoring
+- [ ] Performance improvement
+- [ ] Test coverage
 
 ## Testing
-- [ ] I have tested this change locally
-- [ ] All existing tests pass
-- [ ] New tests have been added for new functionality
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+- [ ] Manual testing completed
+- [ ] Cross-browser testing completed
+- [ ] Mobile responsiveness tested
+
+## Screenshots
+<!-- Add screenshots if applicable -->
 
 ## Checklist
-- [ ] My code follows the project's style guidelines
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
+- [ ] Code follows project style guidelines
+- [ ] Self-review completed
+- [ ] No console errors
+- [ ] No TypeScript errors
+- [ ] All linting rules pass
+- [ ] Documentation updated if needed
+- [ ] Performance impact considered
 
-## Screenshots (if applicable)
-Add screenshots to help explain your changes.
-
-## Additional Notes
-Any additional information or context about the pull request. 
+## Related Issues
+<!-- Link to any related issues -->
+Closes # 
