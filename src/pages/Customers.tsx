@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Search, MoreHorizontal, Edit, Trash2 } from 'lucide-react'
+import { Plus, Search, MoreHorizontal, Filter, X } from 'lucide-react'
 import type { Customer } from '../types'
 
 // Mock data
@@ -47,13 +47,30 @@ const statusColors = {
 
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [industryFilter, setIndustryFilter] = useState<string>('all')
+  const [showFilters, setShowFilters] = useState(false)
   const [customers] = useState(mockCustomers)
 
-  const filteredCustomers = customers.filter(customer =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.company?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredCustomers = customers.filter(customer => {
+    const matchesSearch = 
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.company?.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesStatus = statusFilter === 'all' || customer.status === statusFilter
+    const matchesIndustry = industryFilter === 'all' || customer.industry === industryFilter
+    
+    return matchesSearch && matchesStatus && matchesIndustry
+  })
+
+  const clearFilters = () => {
+    setStatusFilter('all')
+    setIndustryFilter('all')
+    setSearchTerm('')
+  }
+
+  const hasActiveFilters = statusFilter !== 'all' || industryFilter !== 'all' || searchTerm !== ''
 
   return (
     <div className="space-y-6">
@@ -75,18 +92,91 @@ export default function Customers() {
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <Search className="h-5 w-5 text-gray-400" />
+      {/* Search and Filters */}
+      <div className="space-y-4">
+        <div className="flex gap-4">
+          <div className="relative flex-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+              placeholder="Search customers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ${
+              showFilters 
+                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
+                : 'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <Filter className="h-5 w-5 mr-1.5" />
+            Filters
+          </button>
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-200"
+            >
+              <X className="h-5 w-5 mr-1.5" />
+              Clear
+            </button>
+          )}
         </div>
-        <input
-          type="text"
-          className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-          placeholder="Search customers..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-4">
+            <h3 className="text-sm font-medium text-gray-900">Filters</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="prospect">Prospect</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Industry
+                </label>
+                <select
+                  value={industryFilter}
+                  onChange={(e) => setIndustryFilter(e.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+                >
+                  <option value="all">All Industries</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Software">Software</option>
+                  <option value="Manufacturing">Manufacturing</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Results Summary */}
+      <div className="text-sm text-gray-500">
+        Showing {filteredCustomers.length} of {customers.length} customers
+        {hasActiveFilters && (
+          <span className="ml-2">
+            (filtered)
+          </span>
+        )}
       </div>
 
       {/* Table */}
@@ -162,7 +252,10 @@ export default function Customers() {
       {filteredCustomers.length === 0 && (
         <div className="text-center py-12">
           <div className="text-gray-500">
-            {searchTerm ? 'No customers found matching your search.' : 'No customers yet.'}
+            {hasActiveFilters 
+              ? 'No customers found matching your filters.' 
+              : 'No customers yet.'
+            }
           </div>
         </div>
       )}
